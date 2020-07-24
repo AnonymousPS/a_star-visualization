@@ -17,18 +17,20 @@ AQUA = (0,255,255)
 
 class cell:
 	def __init__(self,row,col,SIZE,total_rows):
-		self.row = row
-		self.col = col
-		self.total_rows = total_rows
+		#variables for displaying
+		self.row = row			
+		self.col = col			
+		self.total_rows = total_rows	
 		self.SIZE = SIZE
-
+		self.color = WHITE
+		
+		#variables for a_star_algorithm
 		self.f_score = float("inf")
 		self.g_score = float("inf")
 		self.camefrom = None
 		self.neighbors = []
-
-		self.color = WHITE
-
+		
+		# for generating the maze
 		self.visited = False
 
 	def get_pos(self):
@@ -72,7 +74,7 @@ class cell:
 	def make_end(self):
 		self.color = GREEN
 
-	def update_neighbors(self,grid):
+	def update_neighbors(self,grid):		# updating the neighbors for a_star algortihm 
 
 		if self.row<self.total_rows-1 and not grid[self.row+1][self.col].is_barrier():
 			self.neighbors.append(grid[self.row+1][self.col])
@@ -86,7 +88,7 @@ class cell:
 		if self.col>0 and not grid[self.row][self.col-1].is_barrier():
 			self.neighbors.append(grid[self.row][self.col-1])
 	
-	def check_neighbors(self,grid):
+	def check_neighbors(self,grid):		# returns the neighbors which are not visted(for making the maze)
 		neighbors = []
 
 		if self.row<self.total_rows-2 and not grid[self.row+2][self.col].is_visited():
@@ -112,15 +114,15 @@ class cell:
 			self.g_score = float("inf")
 		self.color = WHITE
 
-def remove_wall(a,b,grid):
+def remove_wall(a,b,grid):	# removes the barrier between the current cell and chosen_one
 	x = (a.row + b.row)//2
 	y = (a.col+b.col)//2
 	grid[x][y].reset()
 	return grid
 
 
-def make_maze(WIDTH,gap,WIN):
-	rows = WIDTH//gap
+def make_maze(WIDTH,gap,WIN):			# generating maze using recursive backtracker
+	rows = WIDTH//gap			# ref - https://en.wikipedia.org/wiki/Maze_generation_algorithm
 
 	grid =[[cell(i,j,gap,rows) for j in range(rows)] for i in range(rows)]
 
@@ -138,9 +140,7 @@ def make_maze(WIDTH,gap,WIN):
 	stack.append(current)
 
 	while stack:
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				pygame.quit()
+		quit()
 		
 		neighbors = current.check_neighbors(grid)
 
@@ -172,12 +172,12 @@ def draw(WIN,WIDTH,gap,grid):
 	pygame.display.update()
 
 
-def h(p1,p2):
+def h(p1,p2):				#heuristic function
 	x1,y1 = p1
 	x2,y2 = p2
 	return abs(x1-x2) + abs(y1-y2)
 	
-def lowest_node(open_set):
+def lowest_node(open_set):		#returns the node with lowest f_score
 	lowest = open_set[0]
 	mini = lowest.f_score
 
